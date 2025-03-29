@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kepler.gl Demo</title>
+
+    <!-- Kepler.gl CSS -->
+    <link href="https://unpkg.com/@kepler.gl/styles@3.0.0/dist/kepler.gl.min.css" rel="stylesheet" type="text/css">
+
+    <!-- Additional Styles -->
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            height: 100vh;
+        }
+        #kepler-gl-container {
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Container for Kepler.gl Map -->
+    <div id="kepler-gl-container"></div>
+
+    <!-- Kepler.gl and other dependencies -->
+    <script src="https://unpkg.com/react@16.8.6/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@16.8.6/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/redux@4.0.1/dist/redux.min.js"></script>
+    <script src="https://unpkg.com/@kepler.gl/core@3.0.0/dist/kepler.gl.min.js"></script>
+    <script src="https://unpkg.com/@kepler.gl/react@3.0.0/dist/kepler.gl.min.js"></script>
+    
+    <!-- Dummy Data -->
+    <script src="data.js"></script>
+
+    <script>
+        // Initialize Kepler.gl with dummy data
+        const {KeplerGl} = window['@kepler.gl/react'];
+        const {createStore} = window['redux'];
+
+        // Redux store for Kepler.gl
+        const store = createStore(window['@kepler.gl/core'].keplerGlReducer);
+
+        // Set up Kepler.gl container
+        const keplerGlContainer = document.getElementById('kepler-gl-container');
+
+        // Create Kepler.gl component
+        const keplerMap = React.createElement(KeplerGl, {
+            id: 'demo-map',
+            mapboxApiAccessToken: 'your-mapbox-access-token-here',
+            store: store
+        });
+
+        ReactDOM.render(keplerMap, keplerGlContainer);
+
+        // Load dummy data
+        store.dispatch(window['@kepler.gl/core'].addDataToMap({
+            datasets: [{
+                data: dummyData,
+                info: {
+                    label: 'Dummy Dataset',
+                    id: 'dummy_data'
+                }
+            }],
+            options: {
+                centerMap: true,
+                zoom: 10
+            }
+        }));
+    </script>
+</body>
+</html>
