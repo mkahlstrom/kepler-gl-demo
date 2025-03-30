@@ -21,7 +21,9 @@
 
     <script>
         window.onload = function () {
-            const { Deck, TileLayer, ScatterplotLayer } = deck;
+            const { Deck, TileLayer, ScatterplotLayer, MapView } = deck;
+
+            console.log("Initializing DeckGL...");
 
             // Dummy Data
             const dummyData = [
@@ -39,17 +41,19 @@
                     pitch: 0,
                     bearing: 0
                 },
+                views: [new MapView({ repeat: true })], // Fix: Use MapView
                 controller: true,
-                backgroundColor: [255, 255, 255, 255],  // Fix: Set a white background
+                backgroundColor: [255, 255, 255, 255],  // Fix: White background
                 layers: [
                     // OSM Tile Layer
                     new TileLayer({
                         data: "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
                         minZoom: 0,
                         maxZoom: 19,
-                        tileSize: 256
+                        tileSize: 256,
+                        loadOptions: { fetch: { mode: 'cors' } } // Fix: Force CORS fetch mode
                     }),
-                    // Scatterplot Layer (Red and Green points)
+                    // Scatterplot Layer (Points on the map)
                     new ScatterplotLayer({
                         id: 'scatter-layer',
                         data: dummyData,
@@ -61,6 +65,8 @@
                     })
                 ]
             });
+
+            console.log("DeckGL initialized.");
         };
     </script>
 
