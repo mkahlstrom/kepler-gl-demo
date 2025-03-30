@@ -3,38 +3,40 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kepler.gl Demo</title>
+    <title>Kepler.gl Demo with OSM</title>
 
-    <!-- Load Mapbox and Deck.gl -->
+    <!-- Load deck.gl and supporting libraries -->
     <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
     <script src="https://unpkg.com/@loaders.gl/core@latest/dist.min.js"></script>
     <script src="https://unpkg.com/@loaders.gl/json@latest/dist.min.js"></script>
-    
+
     <!-- Styles -->
     <style>
         body, html { margin: 0; padding: 0; width: 100%; height: 100vh; }
-        #map { width: 100%; height: 100%; }
+        #map { width: 100%; height: 100%; position: absolute; }
     </style>
 </head>
 <body>
-
     <!-- Map Container -->
     <div id="map"></div>
 
-    <!-- Load Dummy Data -->
-    <script src="data.js"></script>
+    <!-- Dummy Data -->
+    <script>
+        var dummyData = {
+            "type": "FeatureCollection",
+            "features": [
+                { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-98.35, 39.50] } }
+            ]
+        };
+    </script>
 
     <script>
-        // Replace with your Mapbox token (Get one for free at mapbox.com)
-        const MAPBOX_ACCESS_TOKEN = 'your-mapbox-access-token-here';
+        const { Deck, TileLayer, ScatterplotLayer } = deck;
 
-        // Create a deck.gl map
-        const deck = new deck.DeckGL({
-            container: 'map',
-            mapStyle: 'mapbox://styles/mapbox/dark-v10',
-            mapboxAccessToken: MAPBOX_ACCESS_TOKEN,
+        const deckInstance = new Deck({
+            parent: document.getElementById('map'),
             initialViewState: {
-                longitude: -98.35, // Center of the US
+                longitude: -98.35,
                 latitude: 39.50,
                 zoom: 4,
                 pitch: 0,
@@ -42,18 +44,36 @@
             },
             controller: true,
             layers: [
-                new deck.ScatterplotLayer({
+                // OSM Tile Layer
+                new TileLayer({
+                    data: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                    minZoom: 0,
+                    maxZoom: 19,
+                    tileSize: 256,
+                    renderSubLayers: props => {
+                        const {
+                            bbox: { west, south, east, north }
+                        } = props.tile;
+
+                        return new deck.BitmapLayer(props, {
+                            data: null,
+                            image: props.data,
+                            bounds: [west, south, east, north]
+                        });
+                    }
+                }),
+                // Scatterplot Layer
+                new ScatterplotLayer({
                     id: 'scatter-layer',
                     data: dummyData.features,
                     getPosition: d => d.geometry.coordinates,
-                    getRadius: 50000, // Adjust point size
-                    getColor: [255, 0, 0], // Red color
+                    getRadius: 50000,
+                    getColor: [255, 0, 0],
                     radiusScale: 100,
                     pickable: true
                 })
             ]
         });
     </script>
-
 </body>
 </html>
