@@ -23,52 +23,32 @@
         window.onload = function () {
             const { Deck, TileLayer, ScatterplotLayer, MapView } = deck;
 
-            console.log("Initializing DeckGL...");
-
             // Dummy Data
-            const dummyData = [
-                { position: [-98.35, 39.50], color: [255, 0, 0] }, // Red dot in the US
-                { position: [-74.006, 40.7128], color: [0, 255, 0] } // Green dot in NYC
-            ];
-
-            // Initialize DeckGL
-            new Deck({
-                container: 'map-container',
-                initialViewState: {
-                    longitude: -98.35,
-                    latitude: 39.50,
-                    zoom: 4,
-                    pitch: 0,
-                    bearing: 0
-                },
-                views: [new MapView({ repeat: true })], // Fix: Use MapView
-                controller: true,
-                backgroundColor: [255, 255, 255, 255],  // Fix: White background
-                layers: [
-                    // OSM Tile Layer
-                    new TileLayer({
-                        data: "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                        minZoom: 0,
-                        maxZoom: 19,
-                        tileSize: 256,
-                        loadOptions: { fetch: { mode: 'cors' } } // Fix: Force CORS fetch mode
-                    }),
-                    // Scatterplot Layer (Points on the map)
-                    new ScatterplotLayer({
-                        id: 'scatter-layer',
-                        data: dummyData,
-                        getPosition: d => d.position,
-                        getRadius: 50000,
-                        getColor: d => d.color,
-                        radiusScale: 100,
-                        pickable: true
-                    })
-                ]
-            });
-
-            console.log("DeckGL initialized.");
-        };
-    </script>
-
-</body>
-</html>
+            const dummyData = {
+                "type": "FeatureCollection",
+                "features": [
+                    // USA Locations
+                    {
+                        "type": "Feature",
+                        "properties": { "name": "San Francisco" },
+                        "geometry": { "type": "Point", "coordinates": [-122.4194, 37.7749] }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": { "name": "Los Angeles" },
+                        "geometry": { "type": "Point", "coordinates": [-118.2437, 34.0522] }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": { "name": "New York City" },
+                        "geometry": { "type": "Point", "coordinates": [-74.0060, 40.7128] }
+                    },
+                    // Norway Locations 🇳🇴
+                    {
+                        "type": "Feature",
+                        "properties": { "name": "Oslo" },
+                        "geometry": { "type": "Point", "coordinates": [10.7522, 59.9139] }
+                    },
+                    {
+                        "type": "Feature",
+                        "properties": {
