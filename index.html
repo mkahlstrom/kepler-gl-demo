@@ -3,12 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kepler.gl Demo with OSM</title>
+    <title>Kepler.gl with OSM</title>
 
-    <!-- Load deck.gl and supporting libraries -->
+    <!-- Load deck.gl -->
     <script src="https://unpkg.com/deck.gl@latest/dist.min.js"></script>
-    <script src="https://unpkg.com/@loaders.gl/core@latest/dist.min.js"></script>
-    <script src="https://unpkg.com/@loaders.gl/json@latest/dist.min.js"></script>
 
     <!-- Styles -->
     <style>
@@ -26,16 +24,14 @@
             const { Deck, TileLayer, ScatterplotLayer } = deck;
 
             // Dummy Data
-            const dummyData = {
-                "type": "FeatureCollection",
-                "features": [
-                    { "type": "Feature", "geometry": { "type": "Point", "coordinates": [-98.35, 39.50] } }
-                ]
-            };
+            const dummyData = [
+                { position: [-98.35, 39.50], color: [255, 0, 0] }, // Red dot in the US
+                { position: [-74.006, 40.7128], color: [0, 255, 0] } // Green dot in NYC
+            ];
 
             // Initialize DeckGL
             new Deck({
-                container: 'map-container',  // Fix: Use `container` instead of `parent`
+                container: 'map-container',
                 initialViewState: {
                     longitude: -98.35,
                     latitude: 39.50,
@@ -44,31 +40,22 @@
                     bearing: 0
                 },
                 controller: true,
+                backgroundColor: [255, 255, 255, 255],  // Fix: Set a white background
                 layers: [
                     // OSM Tile Layer
                     new TileLayer({
-                        data: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                        data: "https://a.tile.openstreetmap.org/{z}/{x}/{y}.png",
                         minZoom: 0,
                         maxZoom: 19,
-                        tileSize: 256,
-                        subdomains: ['a', 'b', 'c'], // Fix: Add subdomains for OSM
-                        renderSubLayers: props => {
-                            const { bbox: { west, south, east, north } } = props.tile;
-
-                            return new deck.BitmapLayer(props, {
-                                data: null,
-                                image: props.data,
-                                bounds: [west, south, east, north]
-                            });
-                        }
+                        tileSize: 256
                     }),
-                    // Scatterplot Layer (Points on the map)
+                    // Scatterplot Layer (Red and Green points)
                     new ScatterplotLayer({
                         id: 'scatter-layer',
-                        data: dummyData.features,
-                        getPosition: d => d.geometry.coordinates,
+                        data: dummyData,
+                        getPosition: d => d.position,
                         getRadius: 50000,
-                        getColor: [255, 0, 0],  // Red points
+                        getColor: d => d.color,
                         radiusScale: 100,
                         pickable: true
                     })
